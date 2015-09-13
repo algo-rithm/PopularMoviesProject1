@@ -1,0 +1,9 @@
+package com.example.android.popularmovies;
+
+import android.support.v4.app.Fragment;
+
+/**
+ * Created by Noodle Boy on 9/13/2015.
+ */
+public class MovieListFragment extends Fragment {
+}

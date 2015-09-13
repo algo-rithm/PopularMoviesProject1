@@ -9,9 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 /**
  * Created by Peter F Balanesi, @gizmobeta, on 9/1/2015.
  *
- * This abstract class was created to DRY out MovieActivity and MovieListActivity. Both Activity
- * classes host a single fragment. This activity uses a generic container, so that it can be reused
- * by any implementing fragment.
+ * An abstract class created for any activity hosting a single fragment.
  */
 public abstract class SingleFragmentActivity extends AppCompatActivity {
 

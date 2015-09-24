@@ -1,21 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/menu_item_sort_by_most_popular"
-        android:title="@string/sort_by_popularity"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/menu_item_sort_by_highest_rated"
-        android:title="@string/sort_by_highest_rated"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/menu_item_sort_by_highest_revenue"
-        android:title="@string/sort_by_revenue"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/menu_item_sort_by_release_date"
-        android:title="@string/sort_by_release_date"
-        app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_settings"
+            android:title="@string/title_activity_settings"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/menu_item_sort_by_most_popular"
+            android:title="@string/sort_by_popularity" />
+        <item
+            android:id="@+id/menu_item_sort_by_highest_rated"
+            android:title="@string/sort_by_highest_rated"/>
+        <item
+            android:id="@+id/menu_item_sort_by_highest_revenue"
+            android:title="@string/sort_by_revenue"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/menu_item_sort_by_release_date"
+            android:title="@string/sort_by_release_date"
+            app:showAsAction="never" />
+
+
+
 
 </menu>

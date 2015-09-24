@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -30,7 +31,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -40,15 +40,18 @@ public class MovieListFragment extends Fragment {
 
     private RecyclerView mMovieRecyclerView;
     private MovieAdapter mMovieAdapter;
-    public Movie[] mReturnedMovieList;
-    static private Comparator<Movie> descPopular;
-    static private Comparator<Movie> descRating;
+
+    private String collectionChoice = "popularity.desc";
+
+
 
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+
     }
 
     @Override
@@ -60,39 +63,56 @@ public class MovieListFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
 
-        FetchPopularMoviesTask fpmt = new FetchPopularMoviesTask();
+        //FetchPopularMoviesTask fpmt = new FetchPopularMoviesTask();
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         switch (item.getItemId()){
+            case R.id.action_settings:
+                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                return true;
             case R.id.menu_item_sort_by_most_popular:
+
+                collectionChoice = "popularity.desc";
+
                 MovieList.get(getActivity()).clearMovies();
-                fpmt.execute("popularity.desc");
+                updateMovieList();
                 //String title = getString(R.string.app_name);
 
-                activity.getSupportActionBar().setSubtitle("Most Popular");
+                activity.getSupportActionBar().setSubtitle("Most Popular Collection");
                 return true;
             case R.id.menu_item_sort_by_highest_rated:
+
+                collectionChoice = "vote_average.desc";
+
                 MovieList.get(getActivity()).clearMovies();
-                fpmt.execute("vote_average.desc");
+                updateMovieList();
 
 
-                activity.getSupportActionBar().setSubtitle("Highest Rated");
+                activity.getSupportActionBar().setSubtitle("Highest Rated Collection");
                 return true;
+
             case R.id.menu_item_sort_by_highest_revenue:
-                MovieList.get(getActivity()).clearMovies();
-                fpmt.execute("revenue.desc");
 
-                activity.getSupportActionBar().setSubtitle("Highest Revenue");
+                collectionChoice = "revenue.desc";
+
+                MovieList.get(getActivity()).clearMovies();
+                updateMovieList();
+
+                activity.getSupportActionBar().setSubtitle("Highest Revenue Collection");
                 return true;
-            case R.id.menu_item_sort_by_release_date:
-                MovieList.get(getActivity()).clearMovies();
-                fpmt.execute("release_date.desc");
 
-                activity.getSupportActionBar().setSubtitle("Release Date");
+            case R.id.menu_item_sort_by_release_date:
+
+                collectionChoice = "release_date.desc";
+
+                MovieList.get(getActivity()).clearMovies();
+                updateMovieList();
+                activity.getSupportActionBar().setSubtitle("Release Date Collection");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
@@ -113,10 +133,14 @@ public class MovieListFragment extends Fragment {
          * RecyclerView;
          */
         FetchPopularMoviesTask fpmt = new FetchPopularMoviesTask();
-        fpmt.execute("popularity.desc");
+        String pagebulk = PreferenceManager.getDefaultSharedPreferences(getActivity())
+                .getString(getString(R.string.pref_pagebulk_key),getString(R.string.pref_pagebulk_default));
+        fpmt.execute(collectionChoice, pagebulk);
+
+
 
         AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.getSupportActionBar().setSubtitle("Most Popular");
+        activity.getSupportActionBar().setSubtitle("Most Popular Collection");
 
         return rootView;
 
@@ -125,23 +149,17 @@ public class MovieListFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
-        updateUI();
+        MovieList.get(getActivity()).clearMovies();
+        updateMovieList();
     }
 
-    static {
-        descPopular = new Comparator<Movie>() {
-            @Override
-            public int compare(Movie lhs, Movie rhs) {
-                return lhs.getPopularity().compareTo(rhs.getPopularity());
-            }
-        };
 
-        descRating = new Comparator<Movie>() {
-            @Override
-            public int compare(Movie lhs, Movie rhs) {
-                return lhs.getUserRating().compareTo(rhs.getUserRating());
-            }
-        };
+
+    private void updateMovieList(){
+        FetchPopularMoviesTask fpmt = new FetchPopularMoviesTask();
+        String pagebulk = PreferenceManager.getDefaultSharedPreferences(getActivity())
+                .getString(getString(R.string.pref_pagebulk_key),getString(R.string.pref_pagebulk_default));
+        fpmt.execute(collectionChoice, pagebulk);
     }
 
     private void updateUI(){
@@ -188,10 +206,7 @@ public class MovieListFragment extends Fragment {
 
     private class MovieAdapter extends RecyclerView.Adapter<MovieHolder>{
 
-
         private List<Movie> mMovies;
-
-
 
         public MovieAdapter(List<Movie> movies){
             mMovies = movies;
@@ -208,15 +223,13 @@ public class MovieListFragment extends Fragment {
         public void onBindViewHolder(MovieHolder holder, int position){
 
 
-            // Movie movie = mReturnedMovieList[position];
-
             Movie movie = mMovies.get(position);
             holder.bindMovie(movie);
         }
 
         @Override
         public int getItemCount(){
-            // return mReturnedMovieList.length;
+
             return mMovies.size();
         }
     }
@@ -224,6 +237,89 @@ public class MovieListFragment extends Fragment {
     private class FetchPopularMoviesTask extends AsyncTask<String,Void, Void>{
 
         private final String LOG_TAG = FetchPopularMoviesTask.class.getSimpleName();
+
+        protected Void doInBackground(String... params){
+
+            int pagebulk = Integer.parseInt(params[1]) + 1;
+
+            for (int i = 1; i < pagebulk; i++) {
+
+
+                HttpURLConnection urlConnection = null;
+                BufferedReader reader = null;
+
+                String popMoviesJsonStr = null;
+                String sort_by = params[0];
+                //String sort_by = "popularity.desc";
+                String api_key = "51f4fc55cd0aca9e9c5d43f710768c4f";
+                String numPages = Integer.toString(i);
+                try {
+
+                    final String TMDB_BASE_URL = "http://api.themoviedb.org/3/discover/movie";
+                    final String KEY = "api_key";
+                    final String SORT_PARAM = "sort_by";
+                    final String PAGES_PARAM = "page";
+
+                    Uri builtUri = Uri.parse(TMDB_BASE_URL).buildUpon()
+                            .appendQueryParameter(PAGES_PARAM, numPages)
+                            .appendQueryParameter(SORT_PARAM, sort_by)
+                            .appendQueryParameter(KEY, api_key)
+                            .build();
+
+                    URL url = new URL(builtUri.toString());
+
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.connect();
+
+
+                    InputStream inputStream = urlConnection.getInputStream();
+                    StringBuffer buffer = new StringBuffer();
+                    if (inputStream == null) {
+                        return null;
+
+                    }
+                    reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        buffer.append(line + "\n");
+                    }
+
+                    if (buffer.length() == 0) {
+                        return null;
+                    }
+
+                    popMoviesJsonStr = buffer.toString();
+
+
+                } catch (IOException e) {
+                    Log.v(LOG_TAG, "Error ", e);
+                } finally {
+                    if (urlConnection != null) {
+                        urlConnection.disconnect();
+                    }
+                    if (reader != null) {
+                        try {
+                            reader.close();
+                        } catch (final IOException e) {
+                            Log.e(LOG_TAG, "Error closing stream", e);
+                        }
+                    }
+                }
+
+                try {
+                    getPopularMoviesFromJSON(popMoviesJsonStr);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, e.getMessage(), e);
+                    e.printStackTrace();
+                }
+            }
+            return
+                    null;
+
+
+        }
 
         private void getPopularMoviesFromJSON(String popMoviesJsonStr) throws JSONException {
 
@@ -235,9 +331,13 @@ public class MovieListFragment extends Fragment {
             final String TMDB_RELEASE_DATE = "release_date";
             final String TMDB_VOTE_AVERAGE = "vote_average";
             final String TMDB_POPULARITY = "popularity";
+            final String TMDB_PAGE = "page";
+
+            int numPages = 10;
 
             JSONObject popMovieJson = new JSONObject(popMoviesJsonStr);
             JSONArray popMovieArray = popMovieJson.getJSONArray(TMDB_LIST);
+
 
             for (int i = 0; i < popMovieArray.length(); i++) {
 
@@ -252,82 +352,9 @@ public class MovieListFragment extends Fragment {
                 movie.setPopularity(popMovie.getString(TMDB_POPULARITY));
 
                 MovieList.get(getActivity()).addMovie(movie);
+
+
             }
-
-        }
-
-        protected Void doInBackground(String... params){
-
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            String popMoviesJsonStr = null;
-            String sort_by = params[0];
-            //String sort_by = "popularity.desc";
-            String api_key = "51f4fc55cd0aca9e9c5d43f710768c4f";
-
-            try{
-
-                final String TMDB_BASE_URL = "http://api.themoviedb.org/3/discover/movie";
-                final String KEY = "api_key";
-                final String SORT_PARAM = "sort_by";
-
-                Uri builtUri = Uri.parse(TMDB_BASE_URL).buildUpon()
-                        .appendQueryParameter(SORT_PARAM, sort_by)
-                        .appendQueryParameter(KEY, api_key)
-                        .build();
-
-                URL url = new URL(builtUri.toString());
-
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null){
-                    return null;
-
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null){
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0){
-                    return null;
-                }
-
-                popMoviesJsonStr = buffer.toString();
-
-
-            }   catch (IOException e){
-                Log.v(LOG_TAG, "Error ", e);
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
-                    }
-                }
-            }
-
-            try {
-                getPopularMoviesFromJSON(popMoviesJsonStr);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                e.printStackTrace();
-            }
-            return
-                    null;
-
 
         }
 

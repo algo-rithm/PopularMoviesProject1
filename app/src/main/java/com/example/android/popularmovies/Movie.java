@@ -1,5 +1,6 @@
 package com.example.android.popularmovies;
 
+import java.util.Comparator;
 import java.util.UUID;
 
 /**
@@ -16,6 +17,8 @@ public class Movie {
     private String mUserRating;
     private String mPopularity;
 
+    static private Comparator<Movie> descPopular;
+    static private Comparator<Movie> descRating;
 
     public Movie(){
 
@@ -75,4 +78,21 @@ public class Movie {
     public void setPopularity(String popularity) {
         mPopularity = popularity;
     }
+
+    static {
+        descPopular = new Comparator<Movie>() {
+            @Override
+            public int compare(Movie lhs, Movie rhs) {
+                return lhs.getPopularity().compareTo(rhs.getPopularity());
+            }
+        };
+
+        descRating = new Comparator<Movie>() {
+            @Override
+            public int compare(Movie lhs, Movie rhs) {
+                return lhs.getUserRating().compareTo(rhs.getUserRating());
+            }
+        };
+    }
+
 }

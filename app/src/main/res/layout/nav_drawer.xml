@@ -12,7 +12,7 @@
     <!-- As the main content view, the view below consumes the entire
          space available using match_parent in both dimensions. -->
     <FrameLayout
-        android:id="@+id/fragment_container"
+        android:id="@+id/content_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -22,7 +22,7 @@
          The drawer is given a fixed width in dp and extends the full height of
          the container. A solid background is used for contrast
          with the content view. -->
-    <ListView
+    <android.support.v7.widget.ListView
         android:id="@+id/left_drawer"
         android:scrollbars="vertical"
         android:layout_width="240dp"

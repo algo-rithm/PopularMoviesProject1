@@ -41,6 +41,7 @@ public class MovieListFragment extends Fragment {
     private RecyclerView mMovieRecyclerView;
     private MovieAdapter mMovieAdapter;
 
+
     private String collectionChoice = "popularity.desc";
 
 
@@ -50,6 +51,7 @@ public class MovieListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
 
 
     }
@@ -66,9 +68,7 @@ public class MovieListFragment extends Fragment {
         //FetchPopularMoviesTask fpmt = new FetchPopularMoviesTask();
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         switch (item.getItemId()){
-            case R.id.action_settings:
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                return true;
+
             case R.id.menu_item_sort_by_most_popular:
 
                 collectionChoice = "popularity.desc";

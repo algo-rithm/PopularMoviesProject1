@@ -21,15 +21,14 @@ import android.widget.ListView;
  */
 public class MovieListActivity extends AppCompatActivity{
 
-    private String[] mMovieCollectionGroups;
     private android.support.v7.app.ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ArrayAdapter<String> mAdapter;
     private String mActivityTitle;
-    //private ActionBarDrawerToggle mDrawerToggle;
 
-    private CharSequence mTitle, mDrawerTitle;
+
+    private CharSequence mTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -103,18 +102,14 @@ public class MovieListActivity extends AppCompatActivity{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 
-        // Activate the navigation drawer toggle
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }

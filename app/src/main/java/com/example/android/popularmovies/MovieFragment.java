@@ -14,9 +14,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.UUID;
 
-/**
- * A placeholder fragment containing a simple view.
- */
+
 public class MovieFragment extends Fragment {
 
     private static final String ARG_MOVIE_ID = "movie_id";
@@ -67,11 +65,6 @@ public class MovieFragment extends Fragment {
 
         mVoteAverageView = (TextView)v.findViewById(R.id.movie_detail_vote_average);
         mVoteAverageView.setText(mMovie.getUserRating());
-
-
-
-
-
 
         return v;
     }

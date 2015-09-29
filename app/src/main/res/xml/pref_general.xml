@@ -12,4 +12,15 @@
         android:inputType="text"
         android:singleLine="true" />
 
+    <ListPreference
+        android:title="@string/pref_sortorder_label"
+        android:key="@string/pref_sortorder_key"
+        android:defaultValue="@string/pref_sortorder_default"
+        android:entryValues="@array/pref_sortorder_values"
+        android:entries="@array/pref_sortorder_options"
+        android:inputType="text"
+         />
+
+
+
 </PreferenceScreen>

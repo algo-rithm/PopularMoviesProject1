@@ -7,26 +7,5 @@
             android:id="@+id/action_settings"
             android:title="@string/title_activity_settings"
             app:showAsAction="never" />
-        <item
-            android:id="@+id/menu_item_sort_by_most_popular"
-            android:title="@string/sort_by_popularity"
-            android:visible="false"/>
-        <item
-            android:id="@+id/menu_item_sort_by_highest_rated"
-            android:title="@string/sort_by_highest_rated"
-            android:visible="false"/>
-        <item
-            android:id="@+id/menu_item_sort_by_highest_revenue"
-            android:title="@string/sort_by_revenue"
-            app:showAsAction="never"
-            android:visible="false"/>
-        <item
-            android:id="@+id/menu_item_sort_by_release_date"
-            android:title="@string/sort_by_release_date"
-            app:showAsAction="never"
-            android:visible="false"/>
-
-
-
 
 </menu>

@@ -3,6 +3,8 @@ package com.example.android.popularmovies;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +25,29 @@ public class MovieList {
         return sMovieList;
 
     }
+
+    static final Comparator<Movie> POPULARITY_ORDER = new Comparator<Movie>() {
+        @Override
+        public int compare(Movie lhs, Movie rhs) {
+            return lhs.getPopularity().compareTo(rhs.getPopularity());
+        }
+    };
+
+    public void setPopularOrder(){
+        Collections.sort(getMovies(), POPULARITY_ORDER);
+    }
+
+    static final Comparator<Movie> VOTING_ORDER = new Comparator<Movie>() {
+        @Override
+        public int compare(Movie lhs, Movie rhs) {
+            return lhs.getUserRating().compareTo(rhs.getUserRating());
+        }
+    };
+
+    public void setRatingsOrder(){
+        Collections.sort(getMovies(), VOTING_ORDER);
+    }
+
 
     private MovieList(Context context){
         mMovies = new ArrayList<>();

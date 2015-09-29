@@ -4,33 +4,39 @@
     <string name="action_settings">Settings</string>
     <string name="vote_average_label">Rating:</string>
     <string name="movie_title">Title</string>
-    <string name="sort_by_popularity">Most Popular Collection</string>
-    <string name="sort_by_revenue">Highest Revenue Collection</string>
-    <string name="sort_by_release_date">Release Date</string>
-    <string name="sort_by_highest_rated">Highest Rated</string>
+    <string name="sort_by">Sort Collection</string>
     <string name="title_activity_settings">Settings</string>
     <string name="pref_pagebulk_label">Choose page size of Movie Collection:</string>
     <string name="pref_pagebulk_default" translatable="false">5</string>
     <string name="pref_pagebulk_key" translatable="false">pagebulk</string>
+    <string name="pref_sortorder_label">Choose Sort Direction:</string>
+    <string name="pref_sortorder_default" translatable="false">.desc</string>
+    <string name="pref_sortorder_key" translatable="false">sortorder</string>
     <string name="submenu_title">Choose the Movie Collection:</string>
     <string name="back_button">Back</string>
     <string name="nav_drawer">Collections</string>
-
+    <string name="nav_drawer_label">Choose Collection:</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
     <string-array name="pref_pagebulk_values">
         <item>1</item>
         <item>5</item>
         <item>10</item>
         <item>20</item>
-        <item>30</item>
-        <item>40</item>
     </string-array>
     <string-array name="pref_pagebulk_options">
         <item>1</item>
         <item>5</item>
         <item>10</item>
         <item>20</item>
-        <item>30</item>
-        <item>40</item>
+    </string-array>
+    <string-array name="pref_sortorder_options">
+        <item>Descending</item>
+        <item>Ascending</item>
+    </string-array>
+    <string-array name="pref_sortorder_values">
+        <item>.desc</item>
+        <item>.asc</item>
     </string-array>
     <string-array name="movie_collection_array">
         <item>Most Popular Collection</item>
@@ -38,6 +44,5 @@
         <item>Greatest Revenue Collection</item>
         <item>Release Date Collection</item>
     </string-array>
-    <string name="drawer_open">Open navigation drawer</string>
-    <string name="drawer_close">Close navigation drawer</string>
+
 </resources>

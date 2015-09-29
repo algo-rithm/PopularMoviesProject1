@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -40,19 +39,47 @@ public class MovieListFragment extends Fragment {
 
     private RecyclerView mMovieRecyclerView;
     private MovieAdapter mMovieAdapter;
+    private static final String ARG_MOVIE_COLLECTION = "movie_collection";
 
+    private String collectionChoice;
 
-    private String collectionChoice = "popularity.desc";
+    public static MovieListFragment newInstance(String movieColletion){
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_MOVIE_COLLECTION, movieColletion);
 
+        MovieListFragment fragment = new MovieListFragment();
+        fragment.setArguments(args);
 
-
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
+        String movieCollection = (String) getArguments().getSerializable(ARG_MOVIE_COLLECTION);
 
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.getSupportActionBar().setSubtitle(movieCollection);
+
+        switch (movieCollection){
+            case "Most Popular Collection":
+                collectionChoice = "popularity";
+                break;
+            case "Highest Rated Collection":
+                collectionChoice = "vote_count";
+                break;
+            case "Greatest Revenue Collection":
+                collectionChoice = "revenue";
+                break;
+            case "Release Date Collection":
+                collectionChoice = "release_date";
+                break;
+            default:
+                collectionChoice = "popularity";
+                break;
+        }
 
     }
 
@@ -63,84 +90,21 @@ public class MovieListFragment extends Fragment {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-
-        //FetchPopularMoviesTask fpmt = new FetchPopularMoviesTask();
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        switch (item.getItemId()){
-
-            case R.id.menu_item_sort_by_most_popular:
-
-                collectionChoice = "popularity.desc";
-
-                MovieList.get(getActivity()).clearMovies();
-                updateMovieList();
-                //String title = getString(R.string.app_name);
-
-                activity.getSupportActionBar().setSubtitle("Most Popular Collection");
-                return true;
-            case R.id.menu_item_sort_by_highest_rated:
-
-                collectionChoice = "vote_average.desc";
-
-                MovieList.get(getActivity()).clearMovies();
-                updateMovieList();
-
-
-                activity.getSupportActionBar().setSubtitle("Highest Rated Collection");
-                return true;
-
-            case R.id.menu_item_sort_by_highest_revenue:
-
-                collectionChoice = "revenue.desc";
-
-                MovieList.get(getActivity()).clearMovies();
-                updateMovieList();
-
-                activity.getSupportActionBar().setSubtitle("Highest Revenue Collection");
-                return true;
-
-            case R.id.menu_item_sort_by_release_date:
-
-                collectionChoice = "release_date.desc";
-
-                MovieList.get(getActivity()).clearMovies();
-                updateMovieList();
-                activity.getSupportActionBar().setSubtitle("Release Date Collection");
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 
 
-        /* set the rootView layout to the support.v7.widget RecyclerView. Decided on RecyclerView
-         * to utilize the ViewHolder pattern. As far as I have learned, this approach was created
-         * to deal with the shortcomings of vanilla GridView and ListView layouts
-         */
         View rootView = inflater.inflate(R.layout.fragment_movie_list, container, false);
         mMovieRecyclerView = (RecyclerView) rootView.findViewById(R.id.movie_recycler_view);
 
-        mMovieRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),2));
+        mMovieRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
 
-        /* An extended AsyncTask to fetch the movie list utilizing TMDb (themoviedb.org) API.
-         * It sets mReturnedMovieList with Movie objects through JSON parsed data.
-         * It then runs private method updateUI() which creates the Adapter and sets it to the
-         * RecyclerView;
-         */
         FetchPopularMoviesTask fpmt = new FetchPopularMoviesTask();
-        String pagebulk = PreferenceManager.getDefaultSharedPreferences(getActivity())
+        String pageBulk = PreferenceManager.getDefaultSharedPreferences(getActivity())
                 .getString(getString(R.string.pref_pagebulk_key),getString(R.string.pref_pagebulk_default));
-        fpmt.execute(collectionChoice, pagebulk);
+        String sortOrder = PreferenceManager.getDefaultSharedPreferences(getActivity())
+                .getString(getString(R.string.pref_sortorder_key),getString(R.string.pref_sortorder_default));
 
-
-
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.getSupportActionBar().setSubtitle("Most Popular Collection");
+        fpmt.execute(collectionChoice, sortOrder, pageBulk);
 
         return rootView;
 
@@ -149,17 +113,18 @@ public class MovieListFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
+
         MovieList.get(getActivity()).clearMovies();
         updateMovieList();
     }
-
-
 
     private void updateMovieList(){
         FetchPopularMoviesTask fpmt = new FetchPopularMoviesTask();
         String pagebulk = PreferenceManager.getDefaultSharedPreferences(getActivity())
                 .getString(getString(R.string.pref_pagebulk_key),getString(R.string.pref_pagebulk_default));
-        fpmt.execute(collectionChoice, pagebulk);
+        String sortOrder = PreferenceManager.getDefaultSharedPreferences(getActivity())
+                .getString(getString(R.string.pref_sortorder_key),getString(R.string.pref_sortorder_default));
+        fpmt.execute(collectionChoice, sortOrder, pagebulk);
     }
 
     private void updateUI(){
@@ -240,7 +205,7 @@ public class MovieListFragment extends Fragment {
 
         protected Void doInBackground(String... params){
 
-            int pagebulk = Integer.parseInt(params[1]) + 1;
+            int pagebulk = Integer.parseInt(params[2]) + 1;
 
             for (int i = 1; i < pagebulk; i++) {
 
@@ -249,8 +214,8 @@ public class MovieListFragment extends Fragment {
                 BufferedReader reader = null;
 
                 String popMoviesJsonStr = null;
-                String sort_by = params[0];
-                //String sort_by = "popularity.desc";
+                String sort_by = params[0] + params[1];
+
                 String api_key = "51f4fc55cd0aca9e9c5d43f710768c4f";
                 String numPages = Integer.toString(i);
                 try {
@@ -329,11 +294,10 @@ public class MovieListFragment extends Fragment {
             final String TMDB_SYNOPSIS = "overview";
             final String TMDB_POSTER = "poster_path";
             final String TMDB_RELEASE_DATE = "release_date";
+            final String TMDB_VOTE_COUNT = "vote_count";
             final String TMDB_VOTE_AVERAGE = "vote_average";
             final String TMDB_POPULARITY = "popularity";
             final String TMDB_PAGE = "page";
-
-            int numPages = 10;
 
             JSONObject popMovieJson = new JSONObject(popMoviesJsonStr);
             JSONArray popMovieArray = popMovieJson.getJSONArray(TMDB_LIST);
@@ -348,7 +312,7 @@ public class MovieListFragment extends Fragment {
                 movie.setSynopsis(popMovie.getString(TMDB_SYNOPSIS));
                 movie.setPoster(popMovie.getString(TMDB_POSTER));
                 movie.setReleaseDate(popMovie.getString(TMDB_RELEASE_DATE));
-                movie.setUserRating(popMovie.getString(TMDB_VOTE_AVERAGE));
+                movie.setUserRating(popMovie.getString(TMDB_VOTE_COUNT));
                 movie.setPopularity(popMovie.getString(TMDB_POPULARITY));
 
                 MovieList.get(getActivity()).addMovie(movie);

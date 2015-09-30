@@ -1,12 +1,15 @@
 package com.example.android.popularmovies;
 
-import java.util.Comparator;
+import android.os.Parcel;
+import android.os.ParcelUuid;
+import android.os.Parcelable;
+
 import java.util.UUID;
 
 /**
  * Created by Noodle Boy on 8/29/2015.
  */
-public class Movie {
+public class Movie implements Parcelable {
 
 
     private UUID mID;
@@ -16,9 +19,6 @@ public class Movie {
     private String mReleaseDate;
     private String mUserRating;
     private String mPopularity;
-
-    static private Comparator<Movie> descPopular;
-    static private Comparator<Movie> descRating;
 
     public Movie(){
 
@@ -79,20 +79,39 @@ public class Movie {
         mPopularity = popularity;
     }
 
-    static {
-        descPopular = new Comparator<Movie>() {
-            @Override
-            public int compare(Movie lhs, Movie rhs) {
-                return lhs.getPopularity().compareTo(rhs.getPopularity());
-            }
-        };
+    private Movie(Parcel in){
+        mID = ParcelUuid.CREATOR.createFromParcel(in).getUuid();
+        mTitle = in.readString();
+        mSynopsis = in.readString();
+        mPoster = in.readString();
+        mReleaseDate = in.readString();
+        mUserRating = in.readString();
+        mPopularity = in.readString();
 
-        descRating = new Comparator<Movie>() {
-            @Override
-            public int compare(Movie lhs, Movie rhs) {
-                return lhs.getUserRating().compareTo(rhs.getUserRating());
-            }
-        };
+    }
+
+    public void writeToParcel(Parcel out, int flags){
+        new ParcelUuid(mID).writeToParcel(out,0);
+        out.writeString(mTitle);
+        out.writeString(mSynopsis);
+        out.writeString(mPoster);
+        out.writeString(mReleaseDate);
+        out.writeString(mUserRating);
+        out.writeString(mPopularity);
+    }
+
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>(){
+        public Movie createFromParcel(Parcel in){
+            return new Movie(in);
+        }
+
+        public Movie[] newArray(int size){
+            return new Movie[size];
+        }
+    };
+
+    public int describeContents(){
+        return 0;
     }
 
 }

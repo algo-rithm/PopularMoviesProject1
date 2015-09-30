@@ -5,7 +5,6 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -14,7 +13,7 @@ import java.util.UUID;
 public class MovieList {
 
     private static MovieList sMovieList;
-    private List<Movie> mMovies;
+    private ArrayList<Movie> mMovies;
 
 
     public static MovieList get(Context context){
@@ -61,7 +60,7 @@ public class MovieList {
         mMovies.add(m);
     }
 
-    public List<Movie> getMovies(){
+    public ArrayList<Movie> getMovies(){
         return mMovies;
     }
 

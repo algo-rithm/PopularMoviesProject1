@@ -221,7 +221,7 @@ public class MovieListFragment extends Fragment {
                 String popMoviesJsonStr = null;
                 String sort_by = params[0] + params[1];
 
-                String api_key = "51f4fc55cd0aca9e9c5d43f710768c4f";
+                String api_key = "";
                 String numPages = Integer.toString(i);
                 try {
 

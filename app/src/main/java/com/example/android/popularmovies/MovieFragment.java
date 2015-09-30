@@ -21,7 +21,7 @@ public class MovieFragment extends Fragment {
 
     private Movie mMovie;
     private ImageView mImageView;
-    private TextView mTitleView, mSynopsisView,mReleaseDateView, mVoteAverageView ;
+    private TextView mTitleView, mSynopsisView,mReleaseDateView, mPopularityView, mVoteRatingView, mVoteAverageView ;
 
     public static MovieFragment newInstance(UUID movieId){
         Bundle args = new Bundle();
@@ -40,7 +40,6 @@ public class MovieFragment extends Fragment {
         UUID movieId = (UUID) getArguments().getSerializable(ARG_MOVIE_ID);
 
         mMovie = MovieList.get(getActivity()).getMovie(movieId);
-
 
     }
 
@@ -63,8 +62,14 @@ public class MovieFragment extends Fragment {
         mSynopsisView = (TextView)v.findViewById(R.id.movie_detail_overview_text);
         mSynopsisView.setText(mMovie.getSynopsis());
 
+        mPopularityView = (TextView)v.findViewById(R.id.movie_detail_popularity);
+        mPopularityView.setText(mMovie.getPopularity());
+
+        mVoteRatingView = (TextView)v.findViewById(R.id.movie_detail_vote_rating);
+        mVoteRatingView.setText(mMovie.getUserRating());
+
         mVoteAverageView = (TextView)v.findViewById(R.id.movie_detail_vote_average);
-        mVoteAverageView.setText(mMovie.getUserRating());
+        mVoteAverageView.setText(mMovie.getVoteAverage());
 
         return v;
     }

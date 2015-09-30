@@ -15,14 +15,12 @@ public class MovieList {
     private static MovieList sMovieList;
     private ArrayList<Movie> mMovies;
 
-
     public static MovieList get(Context context){
         if (sMovieList == null) {
             sMovieList = new MovieList(context);
         }
 
         return sMovieList;
-
     }
 
     static final Comparator<Movie> POPULARITY_ORDER = new Comparator<Movie>() {
@@ -46,7 +44,6 @@ public class MovieList {
     public void setRatingsOrder(){
         Collections.sort(getMovies(), VOTING_ORDER);
     }
-
 
     private MovieList(Context context){
         mMovies = new ArrayList<>();

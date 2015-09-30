@@ -11,21 +11,19 @@ import java.util.UUID;
  */
 public class Movie implements Parcelable {
 
-
     private UUID mID;
     private String mTitle;
     private String mSynopsis;
     private String mPoster;
     private String mReleaseDate;
     private String mUserRating;
+    private String mVoteAverage;
     private String mPopularity;
 
     public Movie(){
 
-        //Generate Universal Unique Identifier UUID
         mID = UUID.randomUUID();
     }
-
 
     public UUID getID() {
         return mID;
@@ -71,6 +69,14 @@ public class Movie implements Parcelable {
         mUserRating = userRating;
     }
 
+    public String getVoteAverage() {
+        return mVoteAverage;
+    }
+
+    public void setVoteAverage(String voteAverage) {
+        mVoteAverage = voteAverage;
+    }
+
     public String getPopularity() {
         return mPopularity;
     }
@@ -86,6 +92,7 @@ public class Movie implements Parcelable {
         mPoster = in.readString();
         mReleaseDate = in.readString();
         mUserRating = in.readString();
+        mVoteAverage = in.readString();
         mPopularity = in.readString();
 
     }
@@ -97,6 +104,7 @@ public class Movie implements Parcelable {
         out.writeString(mPoster);
         out.writeString(mReleaseDate);
         out.writeString(mUserRating);
+        out.writeString(mVoteAverage);
         out.writeString(mPopularity);
     }
 

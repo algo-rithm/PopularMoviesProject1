@@ -99,13 +99,26 @@ public class MovieListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 
-        MovieList.get(getActivity()).clearMovies();
-
-
         View rootView = inflater.inflate(R.layout.fragment_movie_list, container, false);
         mMovieRecyclerView = (RecyclerView) rootView.findViewById(R.id.movie_recycler_view);
-
         mMovieRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+
+        return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+
+        //ml = MovieList.get(getActivity()).getMovies();
+        //outState.putParcelableArrayList(ARG_MOVIE_KEY, ml);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        MovieList.get(getActivity()).clearMovies();
 
         FetchPopularMoviesTask fpmt = new FetchPopularMoviesTask();
         String pageBulk = PreferenceManager.getDefaultSharedPreferences(getActivity())
@@ -115,22 +128,7 @@ public class MovieListFragment extends Fragment {
 
         fpmt.execute(collectionChoice, sortOrder, pageBulk);
 
-        return rootView;
-
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState){
-        super.onSaveInstanceState(outState);
-
-        //ml = MovieList.get(getActivity()).getMovies();
-
-        //outState.putParcelableArrayList(ARG_MOVIE_KEY, ml);
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
+        updateUI();
     }
 
     private void updateUI(){
@@ -192,7 +190,6 @@ public class MovieListFragment extends Fragment {
         @Override
         public void onBindViewHolder(MovieHolder holder, int position){
 
-
             Movie movie = mMovies.get(position);
             holder.bindMovie(movie);
         }
@@ -213,7 +210,6 @@ public class MovieListFragment extends Fragment {
             int pagebulk = Integer.parseInt(params[2]) + 1;
 
             for (int i = 1; i < pagebulk; i++) {
-
 
                 HttpURLConnection urlConnection = null;
                 BufferedReader reader = null;
@@ -242,7 +238,6 @@ public class MovieListFragment extends Fragment {
                     urlConnection.setRequestMethod("GET");
                     urlConnection.connect();
 
-
                     InputStream inputStream = urlConnection.getInputStream();
                     StringBuffer buffer = new StringBuffer();
                     if (inputStream == null) {
@@ -261,7 +256,6 @@ public class MovieListFragment extends Fragment {
                     }
 
                     popMoviesJsonStr = buffer.toString();
-
 
                 } catch (IOException e) {
                     Log.v(LOG_TAG, "Error ", e);
@@ -287,12 +281,9 @@ public class MovieListFragment extends Fragment {
             }
             return
                     null;
-
-
         }
 
         private void getPopularMoviesFromJSON(String popMoviesJsonStr) throws JSONException {
-
 
             try{
                 Log.v(LOG_TAG, popMoviesJsonStr);
@@ -304,13 +295,10 @@ public class MovieListFragment extends Fragment {
                 final String TMDB_VOTE_COUNT = "vote_count";
                 final String TMDB_VOTE_AVERAGE = "vote_average";
                 final String TMDB_POPULARITY = "popularity";
-                final String TMDB_PAGE = "page";
-
 
                     JSONObject popMovieJson = new JSONObject(popMoviesJsonStr);
 
                     JSONArray popMovieArray = popMovieJson.getJSONArray(TMDB_LIST);
-
 
                     for (int i = 0; i < popMovieArray.length(); i++) {
 
@@ -322,24 +310,21 @@ public class MovieListFragment extends Fragment {
                         movie.setPoster(popMovie.getString(TMDB_POSTER));
                         movie.setReleaseDate(popMovie.getString(TMDB_RELEASE_DATE));
                         movie.setUserRating(popMovie.getString(TMDB_VOTE_COUNT));
+                        movie.setVoteAverage(popMovie.getString(TMDB_VOTE_AVERAGE));
                         movie.setPopularity(popMovie.getString(TMDB_POPULARITY));
 
                         MovieList.get(getActivity()).addMovie(movie);
                     }
 
-
             }catch (NullPointerException e){
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
             }
-
         }
 
         @Override
         protected void onPostExecute(Void v){
             updateUI();
         }
-
     }
-
 }

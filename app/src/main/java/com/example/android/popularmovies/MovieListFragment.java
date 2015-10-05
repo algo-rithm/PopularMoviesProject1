@@ -1,7 +1,10 @@
 package com.example.android.popularmovies;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -44,6 +47,8 @@ public class MovieListFragment extends Fragment {
     private static final String ARG_MOVIE_KEY = "movie_key";
     private ArrayList ml;
     private String collectionChoice;
+    private ProgressDialog progress;
+    private static final int DIALOG_DOWNLOAD_PROGRESS = 0;
 
     public static MovieListFragment newInstance(String movieColletion){
         Bundle args = new Bundle();
@@ -120,14 +125,16 @@ public class MovieListFragment extends Fragment {
 
         MovieList.get(getActivity()).clearMovies();
 
-        FetchPopularMoviesTask fpmt = new FetchPopularMoviesTask();
-        String pageBulk = PreferenceManager.getDefaultSharedPreferences(getActivity())
-                .getString(getString(R.string.pref_pagebulk_key),getString(R.string.pref_pagebulk_default));
-        String sortOrder = PreferenceManager.getDefaultSharedPreferences(getActivity())
-                .getString(getString(R.string.pref_sortorder_key),getString(R.string.pref_sortorder_default));
+        if (isNetworkAvailable()) {
 
-        fpmt.execute(collectionChoice, sortOrder, pageBulk);
+            FetchPopularMoviesTask fpmt = new FetchPopularMoviesTask();
+            String pageBulk = PreferenceManager.getDefaultSharedPreferences(getActivity())
+                    .getString(getString(R.string.pref_pagebulk_key), getString(R.string.pref_pagebulk_default));
+            String sortOrder = PreferenceManager.getDefaultSharedPreferences(getActivity())
+                    .getString(getString(R.string.pref_sortorder_key), getString(R.string.pref_sortorder_default));
 
+            fpmt.execute(collectionChoice, sortOrder, pageBulk);
+        }
         updateUI();
     }
 
@@ -143,6 +150,12 @@ public class MovieListFragment extends Fragment {
             mMovieAdapter.notifyDataSetChanged();
         }
 
+    }
+
+    private boolean isNetworkAvailable(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     private class MovieHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -201,9 +214,21 @@ public class MovieListFragment extends Fragment {
         }
     }
 
-    private class FetchPopularMoviesTask extends AsyncTask<String,Void, Void>{
+    private class FetchPopularMoviesTask extends AsyncTask<String,Integer, Void>{
 
         private final String LOG_TAG = FetchPopularMoviesTask.class.getSimpleName();
+        ProgressDialog pd;
+
+
+        @Override
+        protected void onPreExecute(){
+            super.onPreExecute();
+
+            pd = new ProgressDialog(getContext());
+            pd.setMessage("loading");
+            pd.show();
+
+        }
 
         protected Void doInBackground(String... params){
 
@@ -217,7 +242,7 @@ public class MovieListFragment extends Fragment {
                 String popMoviesJsonStr = null;
                 String sort_by = params[0] + params[1];
 
-                String api_key = "";
+                String api_key = "51f4fc55cd0aca9e9c5d43f710768c4f";
                 String numPages = Integer.toString(i);
                 try {
 
@@ -257,6 +282,8 @@ public class MovieListFragment extends Fragment {
 
                     popMoviesJsonStr = buffer.toString();
 
+                    if(isCancelled()) break;
+
                 } catch (IOException e) {
                     Log.v(LOG_TAG, "Error ", e);
                 } finally {
@@ -283,6 +310,16 @@ public class MovieListFragment extends Fragment {
                     null;
         }
 
+        protected void setProgressPercent(int i){
+
+            String pageBulk = PreferenceManager.getDefaultSharedPreferences(getActivity())
+                    .getString(getString(R.string.pref_pagebulk_key), getString(R.string.pref_pagebulk_default));
+
+            int pagebulk = Integer.parseInt(pageBulk);
+
+            publishProgress((int) ((i / (float) pagebulk) * 100));
+        }
+
         private void getPopularMoviesFromJSON(String popMoviesJsonStr) throws JSONException {
 
             try{
@@ -296,9 +333,9 @@ public class MovieListFragment extends Fragment {
                 final String TMDB_VOTE_AVERAGE = "vote_average";
                 final String TMDB_POPULARITY = "popularity";
 
-                    JSONObject popMovieJson = new JSONObject(popMoviesJsonStr);
+                JSONObject popMovieJson = new JSONObject(popMoviesJsonStr);
 
-                    JSONArray popMovieArray = popMovieJson.getJSONArray(TMDB_LIST);
+                JSONArray popMovieArray = popMovieJson.getJSONArray(TMDB_LIST);
 
                     for (int i = 0; i < popMovieArray.length(); i++) {
 
@@ -324,6 +361,12 @@ public class MovieListFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void v){
+            super.onPostExecute(v);
+
+            if (pd != null){
+                pd.dismiss();
+            }
+
             updateUI();
         }
     }

@@ -9,12 +9,13 @@ import android.preference.PreferenceManager;
 public class SettingsActivity extends PreferenceActivity
         implements Preference.OnPreferenceChangeListener {
 
+    //Using deprecated methods bindPreferenceSummaryToValue() & findPreference() to support API 11
+    @SuppressWarnings("deprecation")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.pref_general);
-
 
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_pagebulk_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_sortorder_key)));

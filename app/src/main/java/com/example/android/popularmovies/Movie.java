@@ -19,6 +19,7 @@ public class Movie implements Parcelable {
     private String mUserRating;
     private String mVoteAverage;
     private String mPopularity;
+    private String mBackDrop;
 
     public Movie(){
 
@@ -83,6 +84,14 @@ public class Movie implements Parcelable {
 
     public void setPopularity(String popularity) {
         mPopularity = popularity;
+    }
+
+    public String getBackDrop() {
+        return mBackDrop;
+    }
+
+    public void setBackDrop(String backDrop) {
+        mBackDrop = backDrop;
     }
 
     private Movie(Parcel in){

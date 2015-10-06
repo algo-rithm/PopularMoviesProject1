@@ -20,8 +20,16 @@ public class MovieFragment extends Fragment {
     private static final String ARG_MOVIE_ID = "movie_id";
 
     private Movie mMovie;
-    private ImageView mImageView;
-    private TextView mTitleView, mSynopsisView,mReleaseDateView, mPopularityView, mVoteRatingView, mVoteAverageView ;
+    private ImageView
+            mImageView,
+            mBackdropImageView;
+    private TextView
+            mTitleView,
+            mSynopsisView,
+            mReleaseDateView,
+            mPopularityView,
+            mVoteRatingView,
+            mVoteAverageView ;
 
     public static MovieFragment newInstance(UUID movieId){
         Bundle args = new Bundle();
@@ -48,6 +56,11 @@ public class MovieFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_movie_details, container, false);
 
 
+        mBackdropImageView = (ImageView)v.findViewById(R.id.backdrop_image);
+        Uri uriBackdrop = Uri.parse("http://image.tmdb.org/t/p/w342" + mMovie.getBackDrop());
+        Context contextBackDrop = mBackdropImageView.getContext();
+        Picasso.with(contextBackDrop).load(uriBackdrop).into(mBackdropImageView);
+
         mTitleView = (TextView)v.findViewById(R.id.movie_detail_title_text);
         mTitleView.setText(mMovie.getTitle());
 
@@ -55,7 +68,7 @@ public class MovieFragment extends Fragment {
         mReleaseDateView.setText(mMovie.getReleaseDate());
 
         mImageView = (ImageView)v.findViewById(R.id.movie_detail_image);
-        Uri uri = Uri.parse("http://image.tmdb.org/t/p/w185" + mMovie.getPoster());
+        Uri uri = Uri.parse("http://image.tmdb.org/t/p/w342" + mMovie.getPoster());
         Context context = mImageView.getContext();
         Picasso.with(context).load(uri).into(mImageView);
 

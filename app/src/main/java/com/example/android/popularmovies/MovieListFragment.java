@@ -326,6 +326,7 @@ public class MovieListFragment extends Fragment {
                 Log.v(LOG_TAG, popMoviesJsonStr);
                 final String TMDB_LIST = "results";
                 final String TMDB_TITLE = "original_title";
+                final String TMDB_BACKDROP_IMAGE = "backdrop_path";
                 final String TMDB_SYNOPSIS = "overview";
                 final String TMDB_POSTER = "poster_path";
                 final String TMDB_RELEASE_DATE = "release_date";
@@ -343,6 +344,7 @@ public class MovieListFragment extends Fragment {
                         JSONObject popMovie = popMovieArray.getJSONObject(i);
 
                         movie.setTitle(popMovie.getString(TMDB_TITLE));
+                        movie.setBackDrop(popMovie.getString(TMDB_BACKDROP_IMAGE));
                         movie.setSynopsis(popMovie.getString(TMDB_SYNOPSIS));
                         movie.setPoster(popMovie.getString(TMDB_POSTER));
                         movie.setReleaseDate(popMovie.getString(TMDB_RELEASE_DATE));
